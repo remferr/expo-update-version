@@ -1,0 +1,114 @@
+import { Text, View, StyleSheet, Pressable, FlatList} from "react-native";
+import { Task } from "@/types";
+import Feather from '@expo/vector-icons/Feather';
+import { useState } from "react";
+
+type TaskItemProps =  {
+    task: Task;
+    onChangeCompletion: (id: string) => void; 
+    onDescVisToggle: (id: string) => void; 
+};
+
+    
+
+    
+export default function TaskItem({task, onChangeCompletion, onDescVisToggle}: TaskItemProps) {
+  const [color, setColor] = useState('#ADD8E6');
+  console.log('[TaskItem] received onDescVisToggle:', typeof onDescVisToggle);
+  //const [visDesc, setVisDesc] = useState(false);
+  //const [desc, setDesc] = useState("");
+
+    const checked = (completed: boolean) => {
+          if (completed) {
+          return <Feather name="check-square" size={23} color="gray"/>;
+          }
+          else {
+          return <Feather name="square" size={23} color="#46444C"/>;
+      }
+      };
+      
+      
+  return (
+    <Pressable onPress={() => onDescVisToggle(task.id)} style={styles.todoItem}>
+            <View style={styles.top}>
+              <View style={styles.topLeft}>
+                <View style={[styles.swatch, { backgroundColor: task.color }]} />
+                <Text style={[styles.title, task.completed && styles.completedTask]} >{task.title}</Text> 
+              </View>
+                            
+              <Pressable onPress={() => onChangeCompletion(task.id)}>
+                {checked(task.completed)}
+              </Pressable> 
+            </View> 
+
+            {task.visDesc && task.desc && (
+                  <Text style={styles.desc} >{task.desc}</Text>
+                )}   
+    </Pressable>  
+  );
+}
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+  },
+
+  completedTask: {
+    textDecorationLine: 'line-through',
+    color: '#888',
+    margin: 2,
+    //fontSize: 17,
+    fontWeight: 'heavy',
+  },
+
+  todoItem: {
+    
+    padding: 10,
+    marginVertical: 5,
+    backgroundColor: '#f8f8f8',
+    borderRadius: 5,  
+    width: '100%',
+    
+    
+  },
+
+  top:{
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: '100%',
+    alignItems: "center",
+  },
+  
+  topLeft:{
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  swatch:{
+    width: 20,
+    height: 20,
+    borderRadius: 5,
+    margin:2,
+}, 
+
+
+
+title: {
+  margin: 2,
+  fontSize: 16,
+  fontWeight: "semibold",
+},
+
+desc: {
+  margin: 2,
+  color: '#46444C',
+},
+
+footer:{
+  flex:1,
+  alignItems: "center",
+  justifyContent: "flex-end",
+}
+
+}
+)
