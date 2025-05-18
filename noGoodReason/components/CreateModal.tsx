@@ -39,6 +39,20 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
       }
     }
 
+    const handleTimeInput = ({nativeEvent: {key}}, type:string, time) => {
+      //const upDate = new Date(dueDate)
+
+      if (key === "enter") {
+        if (type === "hr" && (time >= 1) && (time <= 12)){
+          return
+        }
+        else if (type === "min" && (time >= 1) && (time <= 59)){
+          return
+        }
+      }
+
+    }
+
     return (
     <Modal
       visible={visible}
@@ -88,11 +102,24 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
               {!allday &&
                 <Pressable onPress={() => setVisTimePicker(!allday)}>
                   <Text style={styles.calText}> {dueDate.getHours()+" : "+dueDate.getMinutes()} </Text>
+                  <View style={styles.row}>
+                      <TextInput 
+                      style={styles.calText} 
+                      inputMode='numeric' 
+                      maxLength={2}
+                      
+                      onKeyPress={(e) => handleTimeInput(e, "hr", )}
+                      placeholder='_ _'/>
+                      <Text>:</Text>
+                      <TextInput placeholder='_ _'/>
+                  </View>
+                      
+
                 </Pressable>
               }
               </View>
 
-              {visTimePicker &&  (<TimePicker dueDate={dueDate} setDueDate={setDueDate} onClose={() => setVisTimePicker(false)}/> )}
+              
 
               
               </View>
