@@ -17,6 +17,8 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
     const [title, setTitle] = useState('');
     const [allday, setAllDay] = useState(true);
     const [visTimePicker, setVisTimePicker] = useState(false);
+    const [hr, setHr] = useState('1');
+    const [min, setMin] = useState('1');
     
 
     const submit = () => {
@@ -38,7 +40,21 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
       }
     }
     
+    const timeSetter = ({hour, minute}) => {
+        const upDate = new Date(dueDate);
+        //const [hr, setHr] = use();
+        //const [min, setMin] = use();
 
+        if ((hour < 13) && (hour > 0)) {
+          upDate.setHours(hour);
+        }
+        if ((minute < 60) && (minute > 0)) {
+          upDate.setMinutes(minute);
+        }
+
+        setDueDate(upDate);
+
+    }
 
     return (
     <Modal
@@ -92,7 +108,9 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
                         style={styles.dateText} 
                         inputMode='numeric' 
                         maxLength={2}
-                        placeholder='_ _'/>
+                        placeholder='_ _'
+                        onChangeText={setHr}
+                        />
                         <Text style={styles.calText}>: </Text>
                         <TextInput 
                         style={styles.dateText} 
