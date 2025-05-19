@@ -16,9 +16,9 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
     const [color, setColor] = useState('#ADD8E6');
     const [title, setTitle] = useState('');
     const [allday, setAllDay] = useState(true);
-    const [visTimePicker, setVisTimePicker] = useState(false);
-    const [hr, setHr] = useState('1');
-    const [min, setMin] = useState('1');
+    const [hr, setHr] = useState('12');
+    const [min, setMin] = useState('00');
+    const [AM, setAM] = useState(0);
     
 
     const submit = () => {
@@ -35,15 +35,14 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
         setDesc('');
         setDueDate(new Date());
         setAllDay(true);
-        setVisTimePicker(false);
         onClose();
       }
     }
     
-    const timeSetter = ({hour, minute}) => {
+    const timeSetter = () => {
         const upDate = new Date(dueDate);
-        //const [hr, setHr] = use();
-        //const [min, setMin] = use();
+        const hour = parseInt(hr) || 0;
+        const minute = parseInt(min) || 0;
 
         if ((hour < 13) && (hour > 0)) {
           upDate.setHours(hour);
@@ -97,34 +96,50 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
 
               {visCalendar && (<Calendar dueDate={dueDate} setDueDate={setDueDate} onClose={() => setVisCalendar(false)}/> )}
 
-              <View style={styles.dateRow}>
-              <Pressable onPress={() => setAllDay(!allday)} >
+              <View style={styles.row} >
+              <Pressable onPress={() => setAllDay(!allday)} style={styles.dateRow} >
                 <Feather name="clock" size={20} color={"#ADD8E6"}/>
+                <Text> </Text>
               </Pressable>
 
                 {!allday &&
-                  <Pressable onPress={() => setVisTimePicker(!allday) } style={styles.row}>
-                        <TextInput 
+                  <View style={styles.dateRow}>
+
+                    <TextInput 
                         style={styles.dateText} 
                         inputMode='numeric' 
                         maxLength={2}
-                        placeholder='_ _'
-                        onChangeText={setHr}
+                        placeholder={hr}
+                        onChangeText={(text) => {setHr(text); timeSetter();}}
                         />
-                        <Text style={styles.calText}>: </Text>
-                        <TextInput 
+
+                      <Text style={styles.calText}>: </Text>
+
+                      <TextInput 
                         style={styles.dateText} 
                         inputMode='numeric' 
                         maxLength={2}
-                        placeholder='_ _'/>
-                  </Pressable>
+                        placeholder={min}
+                        onChangeText={(text) => {setMin(text); timeSetter();}}
+                        />
+
+                    {if (AM == 0){
+                      <Text>AM</Text>
+                    }
+                    }
+
+
+                  </View>
                 }
+
               </View>
 
               
 
               
               </View>
+
+              <Text>{dueDate.toTimeString()}</Text>
            <Pressable style={styles.addButton} onPress={submit}>
                   <Text>+</Text>     
                 </Pressable>   
