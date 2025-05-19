@@ -18,7 +18,7 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
     const [allday, setAllDay] = useState(true);
     const [hr, setHr] = useState('12');
     const [min, setMin] = useState('00');
-    const [AM, setAM] = useState(0);
+    const [AM, setAM] = useState(true);
     
 
     const submit = () => {
@@ -41,16 +41,14 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
     
     const timeSetter = () => {
         const upDate = new Date(dueDate);
-        const hour = parseInt(hr) || 0;
+        let hour = parseInt(hr) || 12;
         const minute = parseInt(min) || 0;
 
-        if ((hour < 13) && (hour > 0)) {
-          upDate.setHours(hour);
-        }
-        if ((minute < 60) && (minute > 0)) {
-          upDate.setMinutes(minute);
-        }
+        if (!AM && hour < 12) hour += 12;
+        if (AM && hour === 12) hour = 0;
 
+        upDate.setHours(Math.min(24, Math.max(0,hour)));
+        upDate.setMinutes(Math.min(, Math.max(0,minute)));
         setDueDate(upDate);
 
     }
@@ -123,10 +121,12 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
                         onChangeText={(text) => {setMin(text); timeSetter();}}
                         />
 
-                    {if (AM == 0){
-                      <Text>AM</Text>
-                    }
-                    }
+                    <Pressable onPress={() => {setAM(!AM); timeSetter();}}>
+                        {<Text style={styles.calText}>{ AM ? 'AM': 'PM' }</Text>}
+                        
+                        
+                      
+                    </Pressable>
 
 
                   </View>
@@ -139,7 +139,15 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
               
               </View>
 
-              <Text>{dueDate.toTimeString()}</Text>
+              <Text style={{color: '#666'}}>
+                {dueDate.toLocaleTimeString([], { 
+                 hour: '2-digit', 
+        minute: '2-digit',
+       
+    })}
+</Text>
+
+              
            <Pressable style={styles.addButton} onPress={submit}>
                   <Text>+</Text>     
                 </Pressable>   
