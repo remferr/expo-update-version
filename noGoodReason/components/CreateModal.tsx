@@ -5,7 +5,6 @@ import Feather from '@expo/vector-icons/Feather';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Calendar from '@/components/Calendar';
 import Palette from '@/components/Palette';
-import TimePicker from '@/components/TimePicker'
 import {ModalProps} from '@/types';
 
 export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
@@ -38,20 +37,8 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
         onClose();
       }
     }
+    
 
-    const handleTimeInput = ({nativeEvent: {key}}, type:string, time) => {
-      //const upDate = new Date(dueDate)
-
-      if (key === "enter") {
-        if (type === "hr" && (time >= 1) && (time <= 12)){
-          return
-        }
-        else if (type === "min" && (time >= 1) && (time <= 59)){
-          return
-        }
-      }
-
-    }
 
     return (
     <Modal
@@ -99,24 +86,21 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
                 <Feather name="clock" size={20} color={"#ADD8E6"}/>
               </Pressable>
 
-              {!allday &&
-                <Pressable onPress={() => setVisTimePicker(!allday)}>
-                  <Text style={styles.calText}> {dueDate.getHours()+" : "+dueDate.getMinutes()} </Text>
-                  <View style={styles.row}>
-                      <TextInput 
-                      style={styles.calText} 
-                      inputMode='numeric' 
-                      maxLength={2}
-                      
-                      onKeyPress={(e) => handleTimeInput(e, "hr", )}
-                      placeholder='_ _'/>
-                      <Text>:</Text>
-                      <TextInput placeholder='_ _'/>
-                  </View>
-                      
-
-                </Pressable>
-              }
+                {!allday &&
+                  <Pressable onPress={() => setVisTimePicker(!allday) } style={styles.row}>
+                        <TextInput 
+                        style={styles.dateText} 
+                        inputMode='numeric' 
+                        maxLength={2}
+                        placeholder='_ _'/>
+                        <Text style={styles.calText}>: </Text>
+                        <TextInput 
+                        style={styles.dateText} 
+                        inputMode='numeric' 
+                        maxLength={2}
+                        placeholder='_ _'/>
+                  </Pressable>
+                }
               </View>
 
               
@@ -241,6 +225,11 @@ const styles = StyleSheet.create({
         width: 20,
         height: 18,
         color: "red",
+      },
+
+      dateText: {
+        color: "#ADD8E6",
+        maxWidth: 20
       },
 
     });
