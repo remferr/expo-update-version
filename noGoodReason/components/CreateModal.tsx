@@ -45,10 +45,10 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
         const minute = parseInt(min) || 0;
 
         if (!AM && hour < 12) hour += 12;
-        if (AM && hour === 12) hour = 0;
+        
 
         upDate.setHours(Math.min(24, Math.max(0,hour)));
-        upDate.setMinutes(Math.min(, Math.max(0,minute)));
+        upDate.setMinutes(Math.min(60, Math.max(0,minute)));
         setDueDate(upDate);
 
     }
