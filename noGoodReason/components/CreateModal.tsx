@@ -16,7 +16,6 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
     const [color, setColor] = useState('#ADD8E6');
     const [title, setTitle] = useState('');
     const [allday, setAllDay] = useState(true);
-    const [AM, setAM] = useState(dueDate.getHours() < 12);
 
     const submit = () => {
       if (title.trim()){
@@ -36,14 +35,23 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
       }
     }
 
-    const updateHours = (am: boolean, hr) => {
+    const updateHours = (am: boolean, hr: string) => {
+      let hour = parseInt(hr) || 0
       const upDate = new Date(dueDate);
+      if (isNaN(hour) || hour < 1 || hour > 12) return;
+      
 
-      !am && (upDate.setHours(hr + 12));
-      am && upDate.setHours(hr);
+      if (!am && hour !== 12){
+        upDate.setHours(hour+12);
+      }
+      else if (am && hour == 12){
+        upDate.setHours(0);
+      }
+      else {
+        upDate.setHours(hour);
+      }
 
-      setAM((upDate.getHours() <= 12))
-      return upDate;
+      setDueDate(upDate);
     }
 
     const updateMinutes = (min) => {
@@ -54,7 +62,18 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
       return upDate;
     }
 
-    
+    const AMPM = () => {
+      const upDate = new Date(dueDate);
+      
+      if (upDate.getHours() < 12) {
+        upDate.setHours(dueDate.getHours()+12);
+      }
+      else {
+        upDate.setHours(dueDate.getHours()-12);
+      }
+      
+      setDueDate(upDate);
+    }
 
     return (
     <Modal
@@ -110,16 +129,10 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
                         style={styles.dateText} 
                         inputMode='numeric' 
                         maxLength={2}
-                        placeholder={
-                          (dueDate.getHours() % 12) === 0
-                            ? '12'
-                          :
-                            (dueDate.getHours() % 12).toString()
-                        }
-                        //value={}
+                        value={(dueDate.getHours() % 12 ).toString()}
                         onChangeText={(num) => 
-                          setDueDate(updateHours(AM, num))
-                        }
+                          (updateHours(dueDate.getHours() < 12, num))}
+                        keyboardType='number-pad'
                         />
 
                       <Text style={styles.calText}>: </Text>
@@ -134,15 +147,8 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
                         }
                         />
 
-                    <Pressable onPress={() => {
-                      if (dueDate.getHours()>=12) {
-                        updateHours(true, dueDate.getHours()-12)
-                      }
-                      else if (dueDate.getHours()<12){
-                        updateHours(false, dueDate.getHours())
-                      }
-                    }}>
-                        {<Text style={styles.calText}>{ AM ? 'AM': 'PM' }</Text>}
+                    <Pressable onPress={() => {AMPM()}}>
+                        {<Text style={styles.calText}>{ dueDate.getHours() < 12 || dueDate.getHours() >= 24 ? 'AM': 'PM' }</Text>}
                         
                         
                       
