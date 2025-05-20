@@ -16,10 +16,7 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
     const [color, setColor] = useState('#ADD8E6');
     const [title, setTitle] = useState('');
     const [allday, setAllDay] = useState(true);
-    const [hr, setHr] = useState('12');
-    const [min, setMin] = useState('00');
-    const [AM, setAM] = useState(true);
-    
+    const [AM, setAM] = useState(dueDate.getHours() < 12);
 
     const submit = () => {
       if (title.trim()){
@@ -38,20 +35,26 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
         onClose();
       }
     }
-    
-    const timeSetter = () => {
-        const upDate = new Date(dueDate);
-        let hour = parseInt(hr) || 12;
-        const minute = parseInt(min) || 0;
 
-        if (!AM && hour < 12) hour += 12;
-        
+    const updateHours = (am: boolean, hr) => {
+      const upDate = new Date(dueDate);
 
-        upDate.setHours(Math.min(24, Math.max(0,hour)));
-        upDate.setMinutes(Math.min(60, Math.max(0,minute)));
-        setDueDate(upDate);
+      !am && (upDate.setHours(hr + 12));
+      am && upDate.setHours(hr);
 
+      setAM((upDate.getHours() <= 12))
+      return upDate;
     }
+
+    const updateMinutes = (min) => {
+      const upDate = new Date(dueDate);
+
+      upDate.setMinutes(min);
+      
+      return upDate;
+    }
+
+    
 
     return (
     <Modal
@@ -107,8 +110,16 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
                         style={styles.dateText} 
                         inputMode='numeric' 
                         maxLength={2}
-                        placeholder={hr}
-                        onChangeText={(text) => {setHr(text); timeSetter();}}
+                        placeholder={
+                          (dueDate.getHours() % 12) === 0
+                            ? '12'
+                          :
+                            (dueDate.getHours() % 12).toString()
+                        }
+                        //value={}
+                        onChangeText={(num) => 
+                          setDueDate(updateHours(AM, num))
+                        }
                         />
 
                       <Text style={styles.calText}>: </Text>
@@ -117,11 +128,20 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
                         style={styles.dateText} 
                         inputMode='numeric' 
                         maxLength={2}
-                        placeholder={min}
-                        onChangeText={(text) => {setMin(text); timeSetter();}}
+                        value={(dueDate.getMinutes()).toString()}
+                        onChangeText={(num) => 
+                          setDueDate(updateMinutes(num))
+                        }
                         />
 
-                    <Pressable onPress={() => {setAM(!AM); timeSetter();}}>
+                    <Pressable onPress={() => {
+                      if (dueDate.getHours()>=12) {
+                        updateHours(true, dueDate.getHours()-12)
+                      }
+                      else if (dueDate.getHours()<12){
+                        updateHours(false, dueDate.getHours())
+                      }
+                    }}>
                         {<Text style={styles.calText}>{ AM ? 'AM': 'PM' }</Text>}
                         
                         
@@ -140,12 +160,8 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
               </View>
 
               <Text style={{color: '#666'}}>
-                {dueDate.toLocaleTimeString([], { 
-                 hour: '2-digit', 
-        minute: '2-digit',
-       
-    })}
-</Text>
+                {dueDate.toLocaleTimeString()}
+              </Text>
 
               
            <Pressable style={styles.addButton} onPress={submit}>
