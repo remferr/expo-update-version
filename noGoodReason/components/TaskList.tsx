@@ -11,7 +11,7 @@ type TaskListProps = {
 
   
 export default function TaskList({tasks, onChangeCompletion, onDescVisToggle }: TaskListProps) {
-console.log('[TaskList] received onDescVisToggle:', typeof onDescVisToggle);
+//console.log('[TaskList] received onDescVisToggle:', typeof onDescVisToggle);
   return (
     <View>
       {tasks.map(task =>(

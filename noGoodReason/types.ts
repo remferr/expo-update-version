@@ -1,4 +1,3 @@
-
 export type Task = {
     id: string;
     title: string;
@@ -7,8 +6,8 @@ export type Task = {
     desc: string;
     visDesc: boolean;
     dueDate?: Date;
-    startTime: 
-  };
+    allday?: boolean;
+};
 
 export type ModalProps = {
   visible: boolean;

@@ -12,17 +12,34 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
     const [desc, setDesc] = useState("");
     const [visCalendar, setVisCalendar] = useState(false);
     const [visColors, setVisColors] = useState(false);
-    const [dueDate, setDueDate] = useState(new Date);
+    const [dueDate, setDueDate] = useState<Date | null>(null);
     const [color, setColor] = useState('#ADD8E6');
     const [title, setTitle] = useState('');
-    const [allday, setAllDay] = useState(true);
-    const [hrText, setHrText] = useState(dueDate.getHours() % 12  === 0 ? "12" : (dueDate.getHours() % 12).toString().padStart(2,'0'));
-    const [minText, setMinText] = useState(dueDate.getMinutes().toString().padStart(2, '0'));
+    const [allday, setAllDay] = useState(dueDate ? true: null);
+    const [hrText, setHrText] = useState(dueDate ? (dueDate.getHours() % 12  === 0 ? "12" : (dueDate.getHours() % 12).toString().padStart(2,'0')): '');
+    const [minText, setMinText] = useState(dueDate ? (dueDate.getMinutes().toString().padStart(2, '0')): '');
     
     useEffect(() =>{
-      setHrText(dueDate.getHours() % 12  === 0 ? "12" : (dueDate.getHours() % 12).toString().padStart(2,'0'));
+      if (dueDate) {
+        setHrText(dueDate.getHours() % 12  === 0 ? "12" : (dueDate.getHours() % 12).toString().padStart(2,'0'));
       setMinText(dueDate.getMinutes().toString().padStart(2, '0'));
+      }
+      else {
+        setHrText('');
+        setMinText('');
+      } 
     }, [dueDate]);
+
+    const dueDateToggle = () => {
+      if (dueDate){
+        setDueDate(null);
+        setAllDay(null);
+      }
+      else {
+        setDueDate(new Date());
+        setAllDay(true);
+      }
+    }
 
 
     const submit = () => {
@@ -33,21 +50,23 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
           color,
           desc,
           visDesc: false,
-          dueDate
+          dueDate,
+          allday,
         });
         setTitle('');
         setDesc('');
-        setDueDate(new Date());
-        setAllDay(true);
+        setDueDate(null);
+        setAllDay(null);
         onClose();
       }
     }
 
     const updateHours = (am: boolean, hr: string) => {
-      //if (isNaN(hour) || hour < 1 || hour > 12) return;
-      
+      if (!dueDate) return;
+
       if (hr === "") {
         setDueDate(prev => {
+          if (!prev) return null;
           const tempDate = new Date(prev);
           tempDate.setHours(am ? 0: 12);
           return tempDate;
@@ -72,8 +91,11 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
     }
 
     const updateMinutes = (min: string) => {
+      if (!dueDate) return;
+
       if (min === "") {
         setDueDate(prev => {
+          if (!prev) return null;
           const tempDate = new Date(prev);
           tempDate.setMinutes(0);
           return tempDate;
@@ -90,6 +112,8 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
     }
 
     const AMPM = () => {
+      if (!dueDate) return;
+
       const upDate = new Date(dueDate);
       
       if (upDate.getHours() < 12) {
@@ -124,8 +148,6 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
                     <Pressable onPress={() => setVisColors(!visColors)} style={[styles.swatch, { backgroundColor:  color}]}></Pressable>
 
                     {visColors && (<Palette color={color} setColor={setColor} onClose={() => setVisColors(false)}/> )}
-                
-
                 </View>
 
                 <TextInput style={styles.text}
@@ -135,64 +157,82 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
                       onChangeText={setDesc}
                     />
 
-              <View style={styles.row}>
-              <Pressable onPress={() => setVisCalendar(!visCalendar)} style={styles.dateRow}>
-                <MaterialIcons name="edit-calendar" size={24} color="#ADD8E6"/>
-                <Text style={styles.calText}>: {dueDate.toLocaleDateString()} </Text>
-              </Pressable>
+                <View style={styles.row}>
+                  
+                  <View>
+                    <View style={styles.dateRow}>
+                      
+                      <Pressable onPress={() => {dueDateToggle()}}>
+                        <MaterialIcons name="edit-calendar" size={24} color="#ADD8E6"/>
+                      </Pressable>
+                      
+                      {dueDate != null ?
+                      <View> 
+                        <Pressable onPress={() => setVisCalendar(!visCalendar)}>
+                          <Text style={styles.calText}>: {dueDate.toLocaleDateString()} </Text>
+                        </Pressable>
 
-              {visCalendar && (<Calendar dueDate={dueDate} setDueDate={setDueDate} onClose={() => setVisCalendar(false)}/> )}
 
-              <View style={styles.row} >
-              <Pressable onPress={() => setAllDay(!allday)} style={styles.dateRow} >
-                <Feather name="clock" size={20} color={"#ADD8E6"}/>
-                <Text> </Text>
-              </Pressable>
+                        {visCalendar && (<Calendar dueDate={dueDate} setDueDate={setDueDate} onClose={() => setVisCalendar(false)}/> )}
 
-                {!allday &&
-                  <View style={styles.dateRow}>
 
-                    <TextInput 
-                        style={styles.dateText} 
-                        inputMode='numeric' 
-                        maxLength={2}
-                        value={hrText}
-                        onChangeText={setHrText}
-                        onSubmitEditing={() => {
-                          const padded = hrText.padStart(2, '0');
-                          updateHours(dueDate.getHours() < 12, padded);
-                          }
-                        }
-
-                        keyboardType='number-pad'
-                        
-                        />
-
-                      <Text style={styles.calText}>: </Text>
-
-                      <TextInput 
-                        style={styles.dateText} 
-                        inputMode='numeric' 
-                        maxLength={2}
-                        value={minText}
-                        onChangeText={setMinText}
-                        onSubmitEditing={() => {
-                          const padded = minText.padStart(2, '0');
-                          updateMinutes(padded);
-                          }
+                        </View>
+                      :
+                      null
                       }
-                        keyboardType='number-pad'
-                        />
-
-                    <Pressable onPress={() => {AMPM()}}>
-                        {<Text style={styles.calText}>{ dueDate.getHours() < 12 ? 'AM': 'PM' }</Text>}
-                    </Pressable>
+                      </View>
+                    </View>
 
 
+                    <View>
+                      {dueDate != null ?
+                        
+                        <View style={styles.dateRow}>
+                          <Pressable onPress={() => setAllDay(!allday)} style={styles.dateRow} >
+                            <Feather name="clock" size={20} color={"#ADD8E6"}/>
+                          </Pressable>
+                          
+                          {!allday &&
+                              <View style={styles.dateRow}>
+                                <TextInput 
+                                    style={styles.dateText} 
+                                    inputMode='numeric' 
+                                    maxLength={2}
+                                    value={hrText}
+                                    onChangeText={setHrText}
+                                    onSubmitEditing={() => {
+                                      const padded = hrText.padStart(2, '0');
+                                      updateHours(dueDate.getHours() < 12, padded);
+                                      }
+                                    }
+                                    keyboardType='number-pad'
+                                    />
+
+                                    <Text style={styles.calText}>: </Text>
+
+                                    <TextInput 
+                                      style={styles.dateText} 
+                                      inputMode='numeric' 
+                                      maxLength={2}
+                                      value={minText}
+                                      onChangeText={setMinText}
+                                      onSubmitEditing={() => {
+                                        const padded = minText.padStart(2, '0');
+                                        updateMinutes(padded);
+                                        }
+                                      }
+                                      keyboardType='number-pad'
+                                      />
+
+                                      <Pressable onPress={() => {AMPM()}}>
+                                          {<Text style={styles.calText}>{ dueDate.getHours() < 12 ? 'AM': 'PM' }</Text>}
+                                      </Pressable>
+                                  </View>
+                                  }
+                                </View>
+                        : 
+                      null}
                   </View>
-                }
-
-              </View>
            
               </View>
 
@@ -231,12 +271,15 @@ const styles = StyleSheet.create({
         flexDirection:"row",
         justifyContent: "space-between",
         alignItems: "center",
+        alignContent: "center",
+        marginTop: 10,
     },
 
     dateRow: {
       flexDirection:"row",
       alignItems:"center",
-      marginTop: 10,
+      alignContent: "center",
+      //marginTop: 10,
     },
 
     rowRight: {

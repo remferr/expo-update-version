@@ -1,5 +1,6 @@
 import { View, Text, Modal, Pressable, StyleSheet} from 'react-native'
 import React from 'react'
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 export default function Palette( {color, setColor, onClose} ) {
     const colors = ['#ADD8E6', '#FBCEB1', '#C1E1C1', '#FFECB3'];
@@ -26,6 +27,7 @@ export default function Palette( {color, setColor, onClose} ) {
                           />
                         ))}
                         </View>
+                        <MaterialCommunityIcons name="select-color" size={24} color="black" />
         </View>
       </Pressable>
     </Modal>

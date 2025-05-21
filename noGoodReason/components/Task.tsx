@@ -3,6 +3,7 @@ import { Task } from "@/types";
 import Feather from '@expo/vector-icons/Feather';
 import { useState } from "react";
 
+
 type TaskItemProps =  {
     task: Task;
     onChangeCompletion: (id: string) => void; 
@@ -20,13 +21,13 @@ export default function TaskItem({task, onChangeCompletion, onDescVisToggle}: Ta
           return <Feather name="check-square" size={23} color="gray"/>;
           }
           else {
-          return <Feather name="square" size={23} color="#46444C"/>;
+          return <Feather name="square" size={22} color="#46444C"/>;
       }
       };
       
       
   return (
-    <Pressable onPress={() => onDescVisToggle(task.id)} style={styles.todoItem}>
+    <Pressable onPress={() => onDescVisToggle(task.id)} onLongPress={() => {}} style={styles.todoItem}>
             <View style={styles.top}>
               <View style={styles.topLeft}>
                 <View style={[styles.swatch, { backgroundColor: task.color }]} />
@@ -38,9 +39,18 @@ export default function TaskItem({task, onChangeCompletion, onDescVisToggle}: Ta
               </Pressable> 
             </View> 
 
-            {task.visDesc && task.desc && (
+            {task.visDesc && (task.desc || task.dueDate) && (
+              <View style={styles.top}>
                   <Text style={styles.desc} >{task.desc}</Text>
+                  <View>
+                    {task.dueDate && <Text style={styles.desc}>{task.dueDate?.toLocaleDateString()}</Text>}
+                    {!task.allday && <Text style={styles.desc}>{task.dueDate?.toLocaleTimeString()}</Text>}
+                  </View>
+                  
+              </View>
                 )}   
+
+            
     </Pressable>  
   );
 }
