@@ -1,6 +1,6 @@
 import { View, Text, TextInput, Modal, Pressable, StyleSheet, Switch} from 'react-native';
 import React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Feather from '@expo/vector-icons/Feather';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Calendar from '@/components/Calendar';
@@ -16,6 +16,14 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
     const [color, setColor] = useState('#ADD8E6');
     const [title, setTitle] = useState('');
     const [allday, setAllDay] = useState(true);
+    const [hrText, setHrText] = useState(dueDate.getHours() % 12  === 0 ? "12" : (dueDate.getHours() % 12).toString().padStart(2,'0'));
+    const [minText, setMinText] = useState(dueDate.getMinutes().toString().padStart(2, '0'));
+    
+    useEffect(() =>{
+      setHrText(dueDate.getHours() % 12  === 0 ? "12" : (dueDate.getHours() % 12).toString().padStart(2,'0'));
+      setMinText(dueDate.getMinutes().toString().padStart(2, '0'));
+    }, [dueDate]);
+
 
     const submit = () => {
       if (title.trim()){
@@ -36,10 +44,19 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
     }
 
     const updateHours = (am: boolean, hr: string) => {
-      let hour = parseInt(hr) || 0
-      const upDate = new Date(dueDate);
-      if (isNaN(hour) || hour < 1 || hour > 12) return;
+      //if (isNaN(hour) || hour < 1 || hour > 12) return;
       
+      if (hr === "") {
+        setDueDate(prev => {
+          const tempDate = new Date(prev);
+          tempDate.setHours(am ? 0: 12);
+          return tempDate;
+        });
+        return;
+      }
+
+      let hour = parseInt(hr)
+      const upDate = new Date(dueDate);
 
       if (!am && hour !== 12){
         upDate.setHours(hour+12);
@@ -54,12 +71,22 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
       setDueDate(upDate);
     }
 
-    const updateMinutes = (min) => {
+    const updateMinutes = (min: string) => {
+      if (min === "") {
+        setDueDate(prev => {
+          const tempDate = new Date(prev);
+          tempDate.setMinutes(0);
+          return tempDate;
+        });
+        return;
+      }
+
+      const minute = parseInt(min);
       const upDate = new Date(dueDate);
 
-      upDate.setMinutes(min);
+      upDate.setMinutes(minute);
       
-      return upDate;
+      setDueDate(upDate);
     }
 
     const AMPM = () => {
@@ -129,10 +156,16 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
                         style={styles.dateText} 
                         inputMode='numeric' 
                         maxLength={2}
-                        value={(dueDate.getHours() % 12 ).toString()}
-                        onChangeText={(num) => 
-                          (updateHours(dueDate.getHours() < 12, num))}
+                        value={hrText}
+                        onChangeText={setHrText}
+                        onSubmitEditing={() => {
+                          const padded = hrText.padStart(2, '0');
+                          updateHours(dueDate.getHours() < 12, padded);
+                          }
+                        }
+
                         keyboardType='number-pad'
+                        
                         />
 
                       <Text style={styles.calText}>: </Text>
@@ -141,17 +174,18 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
                         style={styles.dateText} 
                         inputMode='numeric' 
                         maxLength={2}
-                        value={(dueDate.getMinutes()).toString()}
-                        onChangeText={(num) => 
-                          setDueDate(updateMinutes(num))
-                        }
+                        value={minText}
+                        onChangeText={setMinText}
+                        onSubmitEditing={() => {
+                          const padded = minText.padStart(2, '0');
+                          updateMinutes(padded);
+                          }
+                      }
+                        keyboardType='number-pad'
                         />
 
                     <Pressable onPress={() => {AMPM()}}>
-                        {<Text style={styles.calText}>{ dueDate.getHours() < 12 || dueDate.getHours() >= 24 ? 'AM': 'PM' }</Text>}
-                        
-                        
-                      
+                        {<Text style={styles.calText}>{ dueDate.getHours() < 12 ? 'AM': 'PM' }</Text>}
                     </Pressable>
 
 
@@ -159,15 +193,9 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
                 }
 
               </View>
-
-              
-
-              
+           
               </View>
 
-              <Text style={{color: '#666'}}>
-                {dueDate.toLocaleTimeString()}
-              </Text>
 
               
            <Pressable style={styles.addButton} onPress={submit}>
@@ -223,6 +251,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         borderRadius: 5,
         justifyContent: "center",
+        marginTop: 10,
     }, 
 
     inputCont: {
@@ -254,6 +283,7 @@ const styles = StyleSheet.create({
 
     calText: {
       color: "#ADD8E6",
+      
     },
 
     pallet: {
@@ -292,7 +322,8 @@ const styles = StyleSheet.create({
 
       dateText: {
         color: "#ADD8E6",
-        maxWidth: 20
+        maxWidth: 20,
+        outlineColor: "#ADD8E6",
       },
 
     });

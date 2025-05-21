@@ -14,9 +14,6 @@ type TaskItemProps =  {
     
 export default function TaskItem({task, onChangeCompletion, onDescVisToggle}: TaskItemProps) {
   const [color, setColor] = useState('#ADD8E6');
-  console.log('[TaskItem] received onDescVisToggle:', typeof onDescVisToggle);
-  //const [visDesc, setVisDesc] = useState(false);
-  //const [desc, setDesc] = useState("");
 
     const checked = (completed: boolean) => {
           if (completed) {
