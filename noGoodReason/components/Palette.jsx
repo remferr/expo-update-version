@@ -14,6 +14,7 @@ export default function Palette( {color, setColor, onClose} ) {
       >
       <Pressable style={styles.modalContainer} onPress={onClose}>
         <View style={styles.colorsCont} onStartShouldSetResponder={() => true}>
+        
           <View style={styles.row}>
              {colors.map((swatchColor) => (
                           <Pressable
@@ -72,5 +73,6 @@ const styles = StyleSheet.create({
         flexDirection:"row",
         justifyContent: "space-between",
     },
+
 
 }) 

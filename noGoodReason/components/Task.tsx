@@ -27,7 +27,7 @@ export default function TaskItem({task, onChangeCompletion, onDescVisToggle}: Ta
       
       
   return (
-    <Pressable onPress={() => onDescVisToggle(task.id)} onLongPress={() => {}} style={styles.todoItem}>
+    <Pressable onPress={() => onDescVisToggle(task.id)} style={styles.todoItem}>
             <View style={styles.top}>
               <View style={styles.topLeft}>
                 <View style={[styles.swatch, { backgroundColor: task.color }]} />

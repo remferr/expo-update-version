@@ -5,8 +5,9 @@ export type Task = {
     color: string;
     desc: string;
     visDesc: boolean;
-    dueDate?: Date;
-    allday?: boolean;
+    dueDate?: Date|null;
+    endDueDate?: Date|null;
+    allday?: boolean|null;
 };
 
 export type ModalProps = {
