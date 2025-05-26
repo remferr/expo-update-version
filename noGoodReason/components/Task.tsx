@@ -1,11 +1,13 @@
-import { Text, View, StyleSheet, Pressable, FlatList} from "react-native";
+import { Text, View, StyleSheet, Pressable, FlatList, Platform} from "react-native";
 import { Task } from "@/types";
 import Feather from '@expo/vector-icons/Feather';
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 
 
 type TaskItemProps =  {
     task: Task;
+    drag: () => void;
+    isActive?: boolean;
     onChangeCompletion: (id: string) => void; 
     onDescVisToggle: (id: string) => void; 
 };
@@ -13,7 +15,7 @@ type TaskItemProps =  {
     
 
     
-export default function TaskItem({task, onChangeCompletion, onDescVisToggle}: TaskItemProps) {
+export default function TaskItem({task, drag, isActive, onChangeCompletion, onDescVisToggle}: TaskItemProps) {
   const [color, setColor] = useState('#ADD8E6');
 
     const checked = (completed: boolean) => {
@@ -27,7 +29,13 @@ export default function TaskItem({task, onChangeCompletion, onDescVisToggle}: Ta
       
       
   return (
-    <Pressable onPress={() => onDescVisToggle(task.id)} style={styles.todoItem}>
+    <Pressable 
+      onLongPress={drag} 
+      onPress={() => onDescVisToggle(task.id)} 
+      onPressIn={Platform.OS === 'web' ? drag: undefined}
+      delayLongPress={200}
+      style={[styles.todoItem, isActive && styles.activeItem]}
+    >
             <View style={styles.top}>
               <View style={styles.topLeft}>
                 <View style={[styles.swatch, { backgroundColor: task.color }]} />
@@ -75,8 +83,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f8f8',
     borderRadius: 5,  
     width: '100%',
-    
-    
+  },
+
+  activeItem: {
+    opacity: 0.8,
+    shadowColor: '#000',
+    elevation: 5,
+    backgroundColor: '#fff'
   },
 
   top:{

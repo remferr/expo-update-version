@@ -1,10 +1,10 @@
-import { View, Text, Pressable, Animated } from 'react-native'
+import { View, Text, Animated, FlatList, StyleSheet} from 'react-native'
 import React from 'react'
 import TaskItem from '@/components/Task';
 import { Task } from '@/types';
-import { useState } from 'react';
-import { PanResponder } from 'react-native';
-import { useRef } from 'react';
+import DraggableFlatList from 'react-native-draggable-flatlist';
+import { GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
+
 
 type TaskListProps = {
     tasks: Task[];
@@ -12,35 +12,36 @@ type TaskListProps = {
     onChangeCompletion: (id: string) => void;
     onDescVisToggle : (id: string) => void;
 };
+
+
   
 export default function TaskList({tasks, setTasks, onChangeCompletion, onDescVisToggle }: TaskListProps) {
-  //const [dragIndex, setDragIndex] = useState<number | null>
 
-  const pan  = useRef(new Animated.ValueXY()).current;
 
-  const panResponder = useRef(PanResponder.create({
-    onMoveShouldSetPanResponder: () => true,
-    onPanResponderMove: Animated.event([null, {dx: pan.x, dy: pan.y}]),
-    onPanResponderRelease: () => {
-      pan.extractOffset();
-    },
-  }),
-  ).current;
-
-  return (
-    <View>
-      {tasks.map(task =>(
-        <Pressable key={task.id} onLongPress={() => {
-
-        }}>
-          <Animated.View
-
-          >
-            <TaskItem key={task.id} task={task} onChangeCompletion={onChangeCompletion} onDescVisToggle={onDescVisToggle}/>
-          </Animated.View>
-        </Pressable>
-                
-      ))}
-    </View>
+ return (
+    <GestureHandlerRootView>
+      <DraggableFlatList
+        data={tasks}
+        renderItem={({ item, drag, isActive}) => (
+          <TaskItem
+            task={item}
+            drag={drag}
+            isActive={isActive}
+            onChangeCompletion={onChangeCompletion}
+            onDescVisToggle={onDescVisToggle}
+          />
+        )}
+        keyExtractor={(item) => item.id}
+        onDragEnd={({data}) => setTasks(data)}
+        activationDistance={20}
+      />
+    </GestureHandlerRootView>
   );
 }
+
+const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      padding: 20,
+    },
+});

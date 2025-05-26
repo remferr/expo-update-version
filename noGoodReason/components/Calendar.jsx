@@ -5,7 +5,9 @@ import Feather from '@expo/vector-icons/Feather';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 
-export default function Calendar( {dueDate, setDueDate, onClose} ) {  
+export default function Calendar( {dueDate, setDueDate, onClose} ) { 
+  if (!dueDate) return null;
+   
     const [monthCounter, setMonthCounter] = useState(dueDate.getMonth()+1)
     const [yearCounter, setYearCounter] = useState(dueDate.getFullYear())
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -63,7 +65,8 @@ export default function Calendar( {dueDate, setDueDate, onClose} ) {
         }
   
     }
-  
+    
+    
     return (
       <Modal
         visible={true}
@@ -71,6 +74,7 @@ export default function Calendar( {dueDate, setDueDate, onClose} ) {
         onRequestClose={onClose}
 
       >
+      
       <Pressable style={styles.modalContainer} onPress={onClose}>
       <View style={styles.calendarCont}  onPress={(e) => e.stopPropagation()}>
         <View style={styles.header}>

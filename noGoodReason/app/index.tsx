@@ -4,16 +4,19 @@ import { useState } from 'react';
 import useTasks from '@/hooks/useTasks';
 import TaskList from '@/components/TaskList';
 import CreateModal from '@/components/CreateModal';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 
 export default function Index() {
-  const {tasks, addTask, changeCompletion, descVisToggle} = useTasks();
+  const {tasks, setTasks, addTask, changeCompletion, descVisToggle} = useTasks();
   const [modalVis, setModalVis] = useState(false);
 
-  console.log('[index] passing toggleDescription:', typeof descVisToggle);
+  
   return (
+    <SafeAreaProvider>
+    <SafeAreaView>
     <View style={styles.container}>
-      <TaskList tasks={tasks} onChangeCompletion={changeCompletion} onDescVisToggle ={descVisToggle}/>
+      <TaskList tasks={tasks} setTasks={setTasks} onChangeCompletion={changeCompletion} onDescVisToggle ={descVisToggle}/>
       
       <CreateModal
         visible={modalVis}
@@ -26,12 +29,17 @@ export default function Index() {
       </Pressable>
 
     </View>
+    </SafeAreaView>
+    </SafeAreaProvider>
   )
 }
 const styles = StyleSheet.create({
+
+
   container: {
     flex: 1,
     padding: 20,
+    zIndex: 1,
   },
 
   addButton:{

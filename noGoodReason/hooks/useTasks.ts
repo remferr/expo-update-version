@@ -26,7 +26,6 @@ export default function useTasks(){
       };
 
       const descVisToggle = (taskId: string) => {
-        console.log('[useTasks] toggleDescription function created', typeof descVisToggle);
         setTasks(prevTasks => prevTasks.map(task => 
             task.id === taskId 
               ? {...task, visDesc: !task.visDesc}
@@ -37,7 +36,7 @@ export default function useTasks(){
 
       
 
-      return {tasks, addTask, changeCompletion, descVisToggle};
+      return {tasks, setTasks, addTask, changeCompletion, descVisToggle};
 
 
 }
