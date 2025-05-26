@@ -1,7 +1,7 @@
 import { Text, View, StyleSheet, Pressable, FlatList, Platform} from "react-native";
 import { Task } from "@/types";
 import Feather from '@expo/vector-icons/Feather';
-import { useState, useCallback, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 
 type TaskItemProps =  {
