@@ -20,3 +20,9 @@ export type CalendarProps = {
   dueDate: Date;
   setDueDate: (date: Date) => void;
 };
+
+export type PaletteProps =  {
+    color: string;
+    setColor: (color: string) => void;
+    onClose: () => void;
+};

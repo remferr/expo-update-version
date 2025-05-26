@@ -3,22 +3,23 @@ import React from 'react';
 import { useState } from 'react';
 import Feather from '@expo/vector-icons/Feather';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { CalendarProps, DayData } from '@/types';
 
-
-export default function Calendar( {dueDate, setDueDate, onClose} ) { 
+const Calendar = ( {dueDate, setDueDate, onClose}: CalendarProps) => { 
   if (!dueDate) return null;
    
     const [monthCounter, setMonthCounter] = useState(dueDate.getMonth()+1)
     const [yearCounter, setYearCounter] = useState(dueDate.getFullYear())
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    const days = ["S", "M", "T", "W", "T", "F", "S"];
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"] as const;
+    const days = ["S", "M", "T", "W", "T", "F", "S"] as const;
   
-    const selectDay = (dayData) => {
+    const selectDay = (dayData: DayData) => {
       changeMonth(dayData.currentMonth);
       setDueDate(new Date(yearCounter, monthCounter-1 + dayData.currentMonth, dayData.day));
+      
     }
   
-    const monthDays = () => {
+    const monthDays = ():DayData[][] => {
       const firstday = new Date(yearCounter,monthCounter-1,1).getDay()
       const lastdate = new Date(yearCounter,monthCounter,0).getDate()
       const lastday = new Date(yearCounter,monthCounter,0).getDay()
@@ -45,7 +46,7 @@ export default function Calendar( {dueDate, setDueDate, onClose} ) {
     }
   
   
-    const changeMonth = (modifier,) => {
+    const changeMonth = (modifier: number) => {
       let newMonth = monthCounter + modifier;
       let newYear = yearCounter;
   
@@ -76,7 +77,7 @@ export default function Calendar( {dueDate, setDueDate, onClose} ) {
       >
       
       <Pressable style={styles.modalContainer} onPress={onClose}>
-      <View style={styles.calendarCont}  onPress={(e) => e.stopPropagation()}>
+      <View style={styles.calendarCont}  onStartShouldSetResponder={() => true}>
         <View style={styles.header}>
           <View style={styles.row}>
               <Pressable onPress={() => changeMonth(-1)}>
@@ -97,9 +98,9 @@ export default function Calendar( {dueDate, setDueDate, onClose} ) {
           )}
         </View>
   
-          {monthDays().map((week, wi) =>(
+          {monthDays().map((week: DayData[], wi) => (
             <View key={wi} style={styles.weeks}>
-              {week.map((dayData, di) => (
+              {week.map((dayData: DayData, di) => (
                 <View key={di} style={[styles.day, dueDate.getDate() === dayData.day && monthCounter=== dueDate.getMonth()+1 && dayData.currentMonth === 0 &&styles.selectedDay]}> 
                     <Pressable onPress={() => selectDay(dayData)}>
                       <Text style={[styles.dateText, dayData.currentMonth !== 0 && styles.dateTextAlt]}>{dayData.day}</Text>
@@ -199,3 +200,4 @@ export default function Calendar( {dueDate, setDueDate, onClose} ) {
 
     });
 
+export default Calendar;

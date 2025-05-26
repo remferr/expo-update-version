@@ -1,11 +1,11 @@
 import { View, Text, Modal, Pressable, StyleSheet} from 'react-native'
 import React from 'react'
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { PaletteProps } from '@/types';
 
-export default function Palette( {color, setColor, onClose} ) {
+export default function Palette( {color, setColor, onClose}: PaletteProps ) {
     const colors = ['#ADD8E6', '#FBCEB1', '#C1E1C1', '#FFECB3'];
     
-
   return (
     <Modal
         visible={true}

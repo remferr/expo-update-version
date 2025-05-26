@@ -4,21 +4,21 @@ import Feather from '@expo/vector-icons/Feather';
 import { useState, useEffect } from "react";
 
 
-type TaskItemProps =  {
-    task: Task;
-    drag: () => void;
-    isActive?: boolean;
-    onChangeCompletion: (id: string) => void; 
-    onDescVisToggle: (id: string) => void; 
-};
+// type TaskItemProps =  {
+//     task: Task;
+//     drag: () => void;
+//     isActive?: boolean;
+//     onChangeCompletion: (id: string) => void; 
+//     onDescVisToggle: (id: string) => void; 
+// };
 
     
 
     
-export default function TaskItem({task, drag, isActive, onChangeCompletion, onDescVisToggle}: TaskItemProps) {
+export default function TaskItem({task, drag, isActive, onChangeCompletion, onDescVisToggle}) {
   const [color, setColor] = useState('#ADD8E6');
 
-    const checked = (completed: boolean) => {
+    const checked = (completed) => {
           if (completed) {
           return <Feather name="check-square" size={23} color="gray"/>;
           }
