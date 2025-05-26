@@ -13,9 +13,11 @@ export default function Index() {
 
   
   return (
-    <SafeAreaProvider>
-    <SafeAreaView>
     <View style={styles.container}>
+      <Pressable style={styles.addButton} onPress={() =>setModalVis(true)}>
+          <Text>+</Text>
+      </Pressable>
+      
       <TaskList tasks={tasks} setTasks={setTasks} onChangeCompletion={changeCompletion} onDescVisToggle ={descVisToggle}/>
       
       <CreateModal
@@ -24,13 +26,7 @@ export default function Index() {
         onAddTask={addTask}
       />
 
-      <Pressable style={styles.addButton} onPress={() =>setModalVis(true)}>
-          <Text>+</Text>
-      </Pressable>
-
     </View>
-    </SafeAreaView>
-    </SafeAreaProvider>
   )
 }
 const styles = StyleSheet.create({
@@ -39,7 +35,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    zIndex: 1,
+    //zIndex: 1,
   },
 
   addButton:{
