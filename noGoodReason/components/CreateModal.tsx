@@ -1,4 +1,4 @@
-import { View, Text, TextInput, Modal, Pressable, StyleSheet, Switch, Keyboard} from 'react-native';
+import { View, Text, TextInput, Modal, Pressable, StyleSheet, Switch, Keyboard, Platform} from 'react-native';
 import React from 'react';
 import { useState, useEffect } from 'react';
 import Feather from '@expo/vector-icons/Feather';
@@ -6,48 +6,177 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Calendar from '@/components/Calendar';
 import Palette from '@/components/Palette';
 import {ModalProps} from '@/types';
+import { KeyboardAvoidingView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
+   const colors = ['#ADD8E6', '#FBCEB1', '#C1E1C1', '#FFECB3'];
+    const [desc, setDesc] = useState("");
     const [visCalendar, setVisCalendar] = useState(false);
+    const [visColors, setVisColors] = useState(false);
+    const [dueDate, setDueDate] = useState<Date | null>(null);
+    const [color, setColor] = useState('#ADD8E6');
+    const [title, setTitle] = useState('');
+    const [allday, setAllDay] = useState(dueDate ? true: null);
+    const [hrText, setHrText] = useState(dueDate ? (dueDate.getHours() % 12  === 0 ? "12" : (dueDate.getHours() % 12).toString().padStart(2,'0')): '');
+    const [minText, setMinText] = useState(dueDate ? (dueDate.getMinutes().toString().padStart(2, '0')): '');
+
+  useEffect(() =>{
+      if (dueDate) {
+        setHrText(dueDate.getHours() % 12  === 0 ? "12" : (dueDate.getHours() % 12).toString().padStart(2,'0'));
+      setMinText(dueDate.getMinutes().toString().padStart(2, '0'));
+      }
+      else {
+        setHrText('');
+        setMinText('');
+      } 
+    }, [dueDate]);
+
+    const dueDateToggle = () => {
+      if (dueDate){
+        setDueDate(null);
+        setAllDay(null);
+      }
+      else {
+        setDueDate(new Date());
+        setAllDay(true);
+      }
+    }
+  
     
+  useEffect(() => {
+    if (visible) {
+      setTitle('');
+      setDesc('');
+      setVisCalendar(false);
+    }
+  }, [visible]);
     
+    // const submit = () => {
+    //   Keyboard.dismiss();
+    //   if (title.trim()){
+    //     onAddTask({
+    //       title,
+    //       completed: false,
+    //       color,
+    //       desc,
+    //       visDesc: false,
+    //       dueDate,
+    //       allday,
+    //     });
+    //     setTitle('');
+    //     setDesc('');
+    //     setDueDate(null);
+    //     setAllDay(null);
+    //     setVisCalendar(false);
+    //     setVisColors(false);
+    //     onClose();
+    //   }
+    // }
 
     const submit = () => {
-      Keyboard.dismiss();
-      if (title.trim()){
+       Keyboard.dismiss();
+       if (!title.trim()) return;
+
         onAddTask({
-          title,
-          completed: false,
+          title, 
+          completed: false, 
           color,
-          desc,
+          desc, 
           visDesc: false,
           dueDate,
           allday,
         });
+
         setTitle('');
         setDesc('');
-        setDueDate(null);
-        setAllDay(null);
         setVisCalendar(false);
-        setVisColors(false);
+
         onClose();
-      }
     }
 
-    
+    const updateHours = (am: boolean, hr: string) => {
+      if (!dueDate) return;
+
+      if (hr === "") {
+        setDueDate(prev => {
+          if (!prev) return null;
+          const tempDate = new Date(prev);
+          tempDate.setHours(am ? 0: 12);
+          return tempDate;
+        });
+        return;
+      }
+
+      let hour = parseInt(hr)
+      const upDate = new Date(dueDate);
+
+      if (!am && hour !== 12){
+        upDate.setHours(hour+12);
+      }
+      else if (am && hour == 12){
+        upDate.setHours(0);
+      }
+      else {
+        upDate.setHours(hour);
+      }
+
+      setDueDate(upDate);
+    }
+
+    const updateMinutes = (min: string) => {
+      if (!dueDate) return;
+
+      if (min === "") {
+        setDueDate(prev => {
+          if (!prev) return null;
+          const tempDate = new Date(prev);
+          tempDate.setMinutes(0);
+          return tempDate;
+        });
+        return;
+      }
+
+      const minute = parseInt(min);
+      const upDate = new Date(dueDate);
+
+      upDate.setMinutes(minute);
+      
+      setDueDate(upDate);
+    }
+
+    const AMPM = () => {
+      if (!dueDate) return;
+
+      const upDate = new Date(dueDate);
+      
+      if (upDate.getHours() < 12) {
+        upDate.setHours(dueDate.getHours()+12);
+      }
+      else {
+        upDate.setHours(dueDate.getHours()-12);
+      }
+      
+      setDueDate(upDate);
+    }
 
     return (
-    <Modal
-      key={`modal-${Date.now()}`}
-      visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-      >
-        <Pressable style={styles.modalContainer} onPress={onClose}>
-            <Pressable style={styles.modalContent} onPress={(e) => e.stopPropagation()}>
+      <Modal
+        visible={visible}
+        transparent
+        animationType="fade"
+        onRequestClose={onClose}
+        statusBarTranslucent
+        >
+            <Pressable style={styles.outside} onPress={onClose}>
+              <Pressable style={styles.inside} onPress={(e) => e.stopPropagation()}>
+                <SafeAreaView>
+                  <KeyboardAvoidingView
+                    behavior={Platform.OS === 'ios' ? 'padding': 'height'}
+                    style={styles.safeContent}
+                  >
+                    <View style={styles.row}>
               
-              <View style={styles.row}>
                 <TextInput style={styles.title}
                       placeholder="Title"
                       placeholderTextColor="gray"
@@ -69,6 +198,7 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
                     />
 
                 <View style={styles.row}>
+                  
                   <View>
                     <View style={styles.dateRow}>
                       
@@ -94,41 +224,132 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
                     </View>
 
 
+                    <View>
+                      {dueDate != null ?
+                        
+                        <View style={styles.dateRow}>
+                          <Pressable onPress={() => setAllDay(!allday)} style={styles.dateRow} >
+                            <Feather name="clock" size={20} color={"#ADD8E6"}/>
+                          </Pressable>
                           
+                          {!allday &&
+                              <View style={styles.dateRow}>
+                                <TextInput 
+                                    style={styles.dateText} 
+                                    inputMode='numeric' 
+                                    maxLength={2}
+                                    value={hrText}
+                                    onChangeText={setHrText}
+                                    onSubmitEditing={() => {
+                                      const padded = hrText.padStart(2, '0');
+                                      updateHours(dueDate.getHours() < 12, padded);
+                                      }
+                                    }
+                                    keyboardType='number-pad'
+                                    />
+
+                                    <Text style={styles.calText}>: </Text>
+
+                                    <TextInput 
+                                      style={styles.dateText} 
+                                      inputMode='numeric' 
+                                      maxLength={2}
+                                      value={minText}
+                                      onChangeText={setMinText}
+                                      onSubmitEditing={() => {
+                                        const padded = minText.padStart(2, '0');
+                                        updateMinutes(padded);
+                                        }
+                                      }
+                                      keyboardType='number-pad'
+                                      />
+
+                                      <Pressable onPress={() => {AMPM()}}>
+                                          {<Text style={styles.calText}>{ dueDate.getHours() < 12 ? 'AM': 'PM' }</Text>}
+                                      </Pressable>
+                                  </View>
+                                  }
+                                </View>
+                        : 
+                      null}
+                  </View>
            
+              </View>
 
 
               
            <Pressable style={styles.addButton} onPress={submit}>
                   <Text>+</Text>     
                 </Pressable>   
-        </Pressable>
-        
-      </Pressable>
-    </Modal>
-  )
+
+                  </KeyboardAvoidingView>
+                </SafeAreaView>
+              </Pressable>
+            </Pressable> 
+        </Modal>
+      )
 }
 
 const styles = StyleSheet.create({
-    modalContainer:{
+    outside:{
         flex:1,
         alignItems: "center",
-        //justifyContent: "flex-end",
-        backgroundColor: 'rgba(137, 154, 162, 0.5)',
-        padding: 15,
+        justifyContent: "flex-start",
+        backgroundColor: 'rgba(182, 197, 204, 0.5)',
+        backfaceVisibility: 'hidden',
+        zIndex:6,
     },
 
-    modalContent:{
-        width: 300,
-        backgroundColor: "white",
-        borderRadius: 5, 
-        padding: 10,
-        justifyContent: "space-between",
-        margin: 5,
-        
+    inside: {
+      backgroundColor: "white",
+      width: '90%',
+      minHeight: 200,
+      marginHorizontal: 15,
+      marginTop: 30,
+      shadowColor: 'rgba(0, 123, 255, 0.5)',
+      shadowOffset: {width: 0, height: 4},
+      shadowOpacity: .2,
+      elevation: 5,
+      borderRadius: 8,
+      borderWidth: 0,
+      zIndex: 5,
     },
 
-    row: {
+    safeContent: {
+      padding: 20,
+      zIndex: 5,
+    },
+
+    addButton: {
+      marginTop: 5,
+      width: 40,
+      height: 40,
+      backgroundColor: "#ADD8E6",
+      alignItems: "center",
+      borderRadius: 5,
+      justifyContent: "center",
+    },
+
+    addButtonText: {
+      color: "white",
+      fontSize: 18,
+    },
+
+    title: {
+      width: 200,
+      fontWeight: "semibold",
+      outlineColor: "#ADD8E6",
+      padding: 3,
+    },
+
+    swatch: {
+        width: 22,
+        height: 22,
+        borderRadius: 5,
+        marginHorizontal: 5,
+      },
+
+      row: {
         flexDirection:"row",
         justifyContent: "space-between",
         alignItems: "center",
@@ -148,16 +369,6 @@ const styles = StyleSheet.create({
         alignItems:"center",
     },
 
-    addButton:{
-        width: 40,
-        height: 40,
-        backgroundColor: "#ADD8E6",
-        alignItems: "center",
-        borderRadius: 5,
-        justifyContent: "center",
-        marginTop: 10,
-    }, 
-
     inputCont: {
         flexDirection:"row",
         alignItems:"center",
@@ -174,17 +385,6 @@ const styles = StyleSheet.create({
         padding: 3,
     },
 
-    title: {
-        flexDirection:"row",
-        alignItems:"center",
-        maxWidth: 200,      
-        width:200,
-        //fontSize: 16,
-        fontWeight: "semibold",
-        outlineColor: "#ADD8E6",
-        padding: 3,
-    },
-
     calText: {
       color: "#ADD8E6",
       
@@ -196,13 +396,6 @@ const styles = StyleSheet.create({
 
       swatchContainer: {
         flexDirection: "row",
-      },
-
-      swatch: {
-        width: 22,
-        height: 22,
-        borderRadius: 5,
-        marginHorizontal: 5,
       },
 
       selectedSwatch: {
@@ -226,8 +419,9 @@ const styles = StyleSheet.create({
 
       dateText: {
         color: "#ADD8E6",
-        maxWidth: 20,
+        maxWidth: 25,
         outlineColor: "#ADD8E6",
       },
 
-    });
+
+  });

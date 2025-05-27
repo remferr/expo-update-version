@@ -19,7 +19,6 @@ export default function TaskList({tasks, setTasks, onChangeCompletion, onDescVis
 
 
  return (
-    <GestureHandlerRootView>
       <DraggableFlatList
         data={tasks}
         renderItem={({ item, drag, isActive}) => (
@@ -35,7 +34,6 @@ export default function TaskList({tasks, setTasks, onChangeCompletion, onDescVis
         onDragEnd={({data}) => setTasks(data)}
         activationDistance={20}
       />
-    </GestureHandlerRootView>
   );
 }
 

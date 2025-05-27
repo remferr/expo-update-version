@@ -4,21 +4,21 @@ import Feather from '@expo/vector-icons/Feather';
 import { useState, useEffect } from "react";
 
 
-// type TaskItemProps =  {
-//     task: Task;
-//     drag: () => void;
-//     isActive?: boolean;
-//     onChangeCompletion: (id: string) => void; 
-//     onDescVisToggle: (id: string) => void; 
-// };
+type TaskItemProps =  {
+    task: Task;
+    drag: () => void;
+    isActive?: boolean;
+    onChangeCompletion: (id: string) => void; 
+    onDescVisToggle: (id: string) => void; 
+};
 
     
 
     
-export default function TaskItem({task, drag, isActive, onChangeCompletion, onDescVisToggle}) {
+export default function TaskItem({task, drag, isActive, onChangeCompletion, onDescVisToggle}: TaskItemProps) {
   const [color, setColor] = useState('#ADD8E6');
 
-    const checked = (completed) => {
+    const checked = (completed: boolean) => {
           if (completed) {
           return <Feather name="check-square" size={23} color="gray"/>;
           }
@@ -47,7 +47,7 @@ export default function TaskItem({task, drag, isActive, onChangeCompletion, onDe
               </Pressable> 
             </View> 
 
-            {task.visDesc && (task.desc || task.dueDate) && (
+            {task.visDesc && (task.dueDate || task.desc) && (
               <View style={styles.top}>
                   <Text style={styles.desc} >{task.desc}</Text>
                   <View>
@@ -87,8 +87,7 @@ const styles = StyleSheet.create({
 
   activeItem: {
     opacity: 0.8,
-    shadowColor: '#000',
-    elevation: 5,
+    elevation: 3,
     backgroundColor: '#fff'
   },
 
