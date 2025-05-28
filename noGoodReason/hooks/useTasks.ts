@@ -14,6 +14,7 @@ export default function useTasks(){
           ]);
         };
 
+
     const changeCompletion = (taskId: String) => {
         setTasks(prevTasks => 
           prevTasks.map(task => 
@@ -34,9 +35,12 @@ export default function useTasks(){
         );
       };
 
+      const updateTaskOrder = (newTasks: Task[]) => {
+        setTasks(newTasks);
+      };
       
 
-      return {tasks, setTasks, addTask, changeCompletion, descVisToggle};
+      return {tasks, setTasks: updateTaskOrder, addTask, changeCompletion, descVisToggle};
 
 
 }

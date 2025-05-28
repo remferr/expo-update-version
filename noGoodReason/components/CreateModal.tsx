@@ -20,6 +20,7 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
     const [allday, setAllDay] = useState(dueDate ? true: null);
     const [hrText, setHrText] = useState(dueDate ? (dueDate.getHours() % 12  === 0 ? "12" : (dueDate.getHours() % 12).toString().padStart(2,'0')): '');
     const [minText, setMinText] = useState(dueDate ? (dueDate.getMinutes().toString().padStart(2, '0')): '');
+    const [priority, setPriority] = useState(1);
 
   useEffect(() =>{
       if (dueDate) {
@@ -49,6 +50,7 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
       setTitle('');
       setDesc('');
       setVisCalendar(false);
+      setPriority(1);
     }
   }, [visible]);
     
@@ -86,11 +88,13 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
           visDesc: false,
           dueDate,
           allday,
+          priority,
         });
 
         setTitle('');
         setDesc('');
         setVisCalendar(false);
+        setPriority(1);
 
         onClose();
     }
@@ -160,6 +164,8 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
       setDueDate(upDate);
     }
 
+
+
     return (
       <Modal
         visible={visible}
@@ -175,27 +181,29 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
                     behavior={Platform.OS === 'ios' ? 'padding': 'height'}
                     style={styles.safeContent}
                   >
+                    <View style={styles.basicSection}>
                     <View style={styles.row}>
               
-                <TextInput style={styles.title}
-                      placeholder="Title"
-                      placeholderTextColor="gray"
-                      value={title}
-                      onChangeText={setTitle}
-                      autoFocus={true}
+                      <TextInput style={styles.title}
+                            placeholder="Title"
+                            placeholderTextColor="gray"
+                            value={title}
+                            onChangeText={setTitle}
+                            autoFocus={true}
+                          />
+
+                          <Pressable onPress={() => setVisColors(!visColors)} style={[styles.swatch, { backgroundColor:  color}]}></Pressable>
+
+                          {visColors && (<Palette color={color} setColor={setColor} onClose={() => setVisColors(false)}/> )}
+                    </View>
+
+                    <TextInput style={styles.text}
+                          placeholder="Description"
+                          placeholderTextColor="gray"
+                          value={desc}
+                          onChangeText={setDesc}
                     />
-
-                    <Pressable onPress={() => setVisColors(!visColors)} style={[styles.swatch, { backgroundColor:  color}]}></Pressable>
-
-                    {visColors && (<Palette color={color} setColor={setColor} onClose={() => setVisColors(false)}/> )}
-                </View>
-
-                <TextInput style={styles.text}
-                      placeholder="Description"
-                      placeholderTextColor="gray"
-                      value={desc}
-                      onChangeText={setDesc}
-                    />
+                    </View>
 
                 <View style={styles.row}>
                   
@@ -221,19 +229,18 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
                       null
                       }
                       </View>
-                    </View>
 
-
-                    <View>
+                      <View>
                       {dueDate != null ?
                         
                         <View style={styles.dateRow}>
-                          <Pressable onPress={() => setAllDay(!allday)} style={styles.dateRow} >
+                          <Pressable onPress={() => setAllDay(!allday)}  style={styles.row}>
                             <Feather name="clock" size={20} color={"#ADD8E6"}/>
+                            <Text style={styles.calText}>: </Text>
                           </Pressable>
                           
                           {!allday &&
-                              <View style={styles.dateRow}>
+                              <View style={styles.row}>
                                 <TextInput 
                                     style={styles.dateText} 
                                     inputMode='numeric' 
@@ -267,19 +274,38 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
                                       <Pressable onPress={() => {AMPM()}}>
                                           {<Text style={styles.calText}>{ dueDate.getHours() < 12 ? 'AM': 'PM' }</Text>}
                                       </Pressable>
+
                                   </View>
                                   }
+
                                 </View>
                         : 
                       null}
                   </View>
+                </View>
+
+                <View style={styles.priorityCont}>
+                  <Pressable onPress={() => setPriority(priority+1)}>
+                    <MaterialIcons name="keyboard-arrow-up" size={20} color="#ADD8E6" />
+                  </Pressable>
+
+                    <Text style={styles.priorityText} >{priority}</Text>
+
+                  <Pressable onPress={() => 
+                  {if (priority !== 0) {
+                    setPriority(priority-1)}
+                  }}
+                    >
+                    <MaterialIcons name="keyboard-arrow-down" size={20} color="#ADD8E6"/>
+                  </Pressable>
+                </View>
            
               </View>
 
-
+              
               
            <Pressable style={styles.addButton} onPress={submit}>
-                  <Text>+</Text>     
+                  <Text style={styles.addButtonText}>+</Text>     
                 </Pressable>   
 
                   </KeyboardAvoidingView>
@@ -328,6 +354,7 @@ const styles = StyleSheet.create({
       alignItems: "center",
       borderRadius: 5,
       justifyContent: "center",
+      shadowColor: 'rgba(0, 123, 255, 0.5)',
     },
 
     addButtonText: {
@@ -352,16 +379,16 @@ const styles = StyleSheet.create({
       row: {
         flexDirection:"row",
         justifyContent: "space-between",
-        alignItems: "center",
+        //alignItems: "center",
         alignContent: "center",
-        marginTop: 10,
+        marginTop: 5,
     },
 
     dateRow: {
       flexDirection:"row",
       alignItems:"center",
       alignContent: "center",
-      //marginTop: 10,
+      //marginBottom: 5,
     },
 
     rowRight: {
@@ -404,7 +431,8 @@ const styles = StyleSheet.create({
       },
 
       clock: {
-        padding: 5,
+        marginRight: 5,
+
       },
 
       switch: {
@@ -419,9 +447,26 @@ const styles = StyleSheet.create({
 
       dateText: {
         color: "#ADD8E6",
-        maxWidth: 25,
+        maxWidth: 20,
         outlineColor: "#ADD8E6",
       },
 
+      priorityCont: {
+        borderRadius: 5,
+        borderWidth: 2,
+        borderColor: "#ADD8E6",
+        width: 25,
+        justifyContent: "center", 
+        alignItems: "center"
+      },
+
+      priorityText: {
+        color: "gray",
+        
+      },
+
+      basicSection: {
+        marginBottom: 15,
+      },
 
   });
