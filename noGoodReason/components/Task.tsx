@@ -58,7 +58,7 @@ export default function TaskItem({task, drag, isActive, onChangeCompletion, onDe
               </View>
                 )}   
 
-            
+            <Text>{task.priority}</Text>
     </Pressable>  
   );
 }
