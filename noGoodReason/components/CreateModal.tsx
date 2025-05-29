@@ -210,7 +210,7 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
                   <View>
                     <View style={styles.dateRow}>
                       
-                      <Pressable onPress={() => {dueDateToggle()}}>
+                      <Pressable onPress={() => {dueDateToggle()}} style={styles.dateRow}>
                         <MaterialIcons name="edit-calendar" size={24} color="#ADD8E6"/>
                       </Pressable>
                       
@@ -230,17 +230,18 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
                       }
                       </View>
 
-                      <View>
+                      <View style={styles.dateRow}>
                       {dueDate != null ?
                         
-                        <View style={styles.dateRow}>
-                          <Pressable onPress={() => setAllDay(!allday)}  style={styles.row}>
+                        <View style={styles.timeHolder}>
+                          <Pressable onPress={() => setAllDay(!allday)}  style={styles.dateRow}>
                             <Feather name="clock" size={20} color={"#ADD8E6"}/>
                             <Text style={styles.calText}>: </Text>
                           </Pressable>
                           
                           {!allday &&
-                              <View style={styles.row}>
+                              <View style={styles.dateRow}>
+                                
                                 <TextInput 
                                     style={styles.dateText} 
                                     inputMode='numeric' 
@@ -255,7 +256,7 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
                                     keyboardType='number-pad'
                                     />
 
-                                    <Text style={styles.calText}>: </Text>
+                                    <Text style={styles.dateText}>:</Text>
 
                                     <TextInput 
                                       style={styles.dateText} 
@@ -272,10 +273,9 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
                                       />
 
                                       <Pressable onPress={() => {AMPM()}}>
-                                          {<Text style={styles.calText}>{ dueDate.getHours() < 12 ? 'AM': 'PM' }</Text>}
+                                          {<Text style={styles.dateText}>{ dueDate.getHours() < 12 ? 'AM': 'PM' }</Text>}
                                       </Pressable>
-
-                                  </View>
+                                    </View>
                                   }
 
                                 </View>
@@ -285,16 +285,16 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
                 </View>
 
                 <View style={styles.priorityCont}>
-                  <Pressable onPress={() => setPriority(priority+1)}>
+                  <Pressable onPress={() => {if (priority !== 0) {
+                    setPriority(priority-1)}
+                  }}>
                     <MaterialIcons name="keyboard-arrow-up" size={20} color="#ADD8E6" />
                   </Pressable>
 
                     <Text style={styles.priorityText} >{priority}</Text>
 
                   <Pressable onPress={() => 
-                  {if (priority !== 0) {
-                    setPriority(priority-1)}
-                  }}
+                    setPriority(priority+1)}
                     >
                     <MaterialIcons name="keyboard-arrow-down" size={20} color="#ADD8E6"/>
                   </Pressable>
@@ -388,7 +388,9 @@ const styles = StyleSheet.create({
       flexDirection:"row",
       alignItems:"center",
       alignContent: "center",
-      //marginBottom: 5,
+      textAlign: "center",
+      paddingVertical: 1,
+      
     },
 
     rowRight: {
@@ -432,7 +434,7 @@ const styles = StyleSheet.create({
 
       clock: {
         marginRight: 5,
-
+        justifyContent: "center",
       },
 
       switch: {
@@ -447,8 +449,12 @@ const styles = StyleSheet.create({
 
       dateText: {
         color: "#ADD8E6",
-        maxWidth: 20,
+        //flexWrap: "wrap",
         outlineColor: "#ADD8E6",
+        maxWidth:24,
+        textAlign: "center",
+        alignContent: "center",
+        justifyContent: "center",
       },
 
       priorityCont: {
@@ -467,6 +473,11 @@ const styles = StyleSheet.create({
 
       basicSection: {
         marginBottom: 15,
+      },
+
+      timeHolder: {
+        flexDirection: "row",
+        justifyContent: "center",
       },
 
   });

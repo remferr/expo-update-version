@@ -15,7 +15,7 @@ type TaskItemProps =  {
     
 
     
-export default function TaskItem({task, drag, isActive, onChangeCompletion, onDescVisToggle}: TaskItemProps) {
+export default function TaskItem({task, isActive, onChangeCompletion, onDescVisToggle}: TaskItemProps) {
   const [color, setColor] = useState('#ADD8E6');
 
     const checked = (completed: boolean) => {
@@ -30,9 +30,9 @@ export default function TaskItem({task, drag, isActive, onChangeCompletion, onDe
       
   return (
     <Pressable 
-      onLongPress={drag} 
+      //onLongPress={drag} 
       onPress={() => onDescVisToggle(task.id)} 
-      onPressIn={Platform.OS === 'web' ? drag: undefined}
+      //onPressIn={Platform.OS === 'web' ? drag: undefined}
       delayLongPress={200}
       style={[styles.todoItem, isActive && styles.activeItem]}
     >

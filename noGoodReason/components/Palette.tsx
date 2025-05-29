@@ -3,8 +3,8 @@ import React from 'react'
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { PaletteProps } from '@/types';
 
-export default function Palette( {color, setColor, onClose}: PaletteProps ) {
-    const colors = ['#ADD8E6', '#FBCEB1', '#C1E1C1', '#FFECB3'];
+const Palette = ( {color, setColor, onClose}: PaletteProps ) => {
+  const colors = ['#ADD8E6', '#FBCEB1', '#C1E1C1', '#FFECB3'];
     
   return (
     <Modal
@@ -34,6 +34,8 @@ export default function Palette( {color, setColor, onClose}: PaletteProps ) {
     </Modal>
   )
 }
+
+
 
 const styles = StyleSheet.create({
     modalContainer: {
@@ -76,3 +78,5 @@ const styles = StyleSheet.create({
 
 
 }) 
+
+export default Palette;

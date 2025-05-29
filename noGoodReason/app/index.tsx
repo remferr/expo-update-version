@@ -14,10 +14,10 @@ export default function Index() {
   return (
     <View style={styles.container}>
       
-      {!modalVis &&
+      
       <View style={styles.listContainer}>
         <TaskList tasks={tasks} setTasks={setTasks} onChangeCompletion={changeCompletion} onDescVisToggle={descVisToggle}></TaskList>
-      </View>}
+      </View>
 
       {modalVis && (<CreateModal visible={modalVis} onClose={() => setModalVis(false)} onAddTask={addTask}></CreateModal>)}
       

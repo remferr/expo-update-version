@@ -19,21 +19,18 @@ export default function TaskList({tasks, setTasks, onChangeCompletion, onDescVis
 
 
  return (
-      <DraggableFlatList
+      <FlatList
         data={tasks}
-        renderItem={({ item, drag, isActive}) => (
-          <TaskItem
-            task={item}
-            drag={drag}
-            isActive={isActive}
-            onChangeCompletion={onChangeCompletion}
-            onDescVisToggle={onDescVisToggle}
-          />
+        renderItem={({ item}) => (<TaskItem
+          task={item}
+          onChangeCompletion={onChangeCompletion}
+          onDescVisToggle={onDescVisToggle}
+          />  
         )}
         keyExtractor={(item) => item.id}
-        onDragEnd={({data}) => setTasks(data)}
-        activationDistance={20}
-      />
+      >
+
+      </FlatList>
   );
 }
 
