@@ -15,9 +15,7 @@ export default function Index() {
     <View style={styles.container}>
       
       
-      <View style={styles.listContainer}>
-        <TaskList tasks={tasks} setTasks={setTasks} onChangeCompletion={changeCompletion} onDescVisToggle={descVisToggle}></TaskList>
-      </View>
+      <TaskList tasks={tasks} setTasks={setTasks} onChangeCompletion={changeCompletion} onDescVisToggle={descVisToggle}></TaskList>
 
       {modalVis && (<CreateModal visible={modalVis} onClose={() => setModalVis(false)} onAddTask={addTask}></CreateModal>)}
       

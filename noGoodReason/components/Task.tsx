@@ -1,22 +1,47 @@
 import { Text, View, StyleSheet, Pressable, FlatList, Platform} from "react-native";
 import { Task } from "@/types";
 import Feather from '@expo/vector-icons/Feather';
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
+import { GestureDetector, Gesture } from 'react-native-gesture-handler';
+import Animated, {useAnimatedStyle, useSharedValue, withSpring} from 'react-native-reanimated';
 
 
 type TaskItemProps =  {
     task: Task;
-    drag: () => void;
+    //drag: () => void;
     isActive?: boolean;
     onChangeCompletion: (id: string) => void; 
     onDescVisToggle: (id: string) => void; 
 };
 
     
-
-    
 export default function TaskItem({task, isActive, onChangeCompletion, onDescVisToggle}: TaskItemProps) {
   const [color, setColor] = useState('#ADD8E6');
+
+  const dragging = useSharedValue(false);
+  const distance = useSharedValue(0);
+
+  const panGesture = Gesture.Pan()
+    .onStart(() => {
+      'worklet';
+    dragging.value = true;
+  })
+    .onUpdate((e) => {
+      'worklet';
+    distance.value = e.translationY;
+  })
+    .onEnd(() => {
+      'worklet';
+      distance.value = withSpring(0);
+      dragging.value = false;
+  });
+
+  const animateStyle = useAnimatedStyle(() => ({
+    transform: [{translateY: distance.value}],
+    elevation: dragging.value ? 3: 0,
+  }));
+
+  
 
     const checked = (completed: boolean) => {
           if (completed) {
@@ -29,37 +54,37 @@ export default function TaskItem({task, isActive, onChangeCompletion, onDescVisT
       
       
   return (
-    <Pressable 
-      //onLongPress={drag} 
-      onPress={() => onDescVisToggle(task.id)} 
-      //onPressIn={Platform.OS === 'web' ? drag: undefined}
-      delayLongPress={200}
-      style={[styles.todoItem, isActive && styles.activeItem]}
-    >
-            <View style={styles.top}>
-              <View style={styles.topLeft}>
-                <View style={[styles.swatch, { backgroundColor: task.color }]} />
-                <Text style={[styles.title, task.completed && styles.completedTask]} >{task.title}</Text> 
-              </View>
-                            
-              <Pressable onPress={() => onChangeCompletion(task.id)}>
-                {checked(task.completed)}
-              </Pressable> 
-            </View> 
-
-            {task.visDesc && (task.dueDate || task.desc) && (
-              <View style={styles.top}>
-                  <Text style={styles.desc} >{task.desc}</Text>
-                  <View>
-                    {task.dueDate && <Text style={styles.desc}>{task.dueDate?.toLocaleDateString()}</Text>}
-                    {!task.allday && <Text style={styles.desc}>{task.dueDate?.toLocaleTimeString()}</Text>}
+    <GestureDetector gesture={panGesture}>
+      <Animated.View style={[styles.todoItem, animateStyle]}>
+        <Pressable 
+          onPress={() => onDescVisToggle(task.id)} 
+        >
+                <View style={styles.top}>
+                  <View style={styles.topLeft}>
+                    <View style={[styles.swatch, { backgroundColor: task.color }]} />
+                    <Text style={[styles.title, task.completed && styles.completedTask]} >{task.title}</Text> 
                   </View>
-                  
-              </View>
-                )}   
+                                
+                  <Pressable onPress={() => onChangeCompletion(task.id)}>
+                    {checked(task.completed)}
+                  </Pressable> 
+                </View> 
 
-            <Text>{task.priority}</Text>
-    </Pressable>  
+                {task.visDesc && (task.dueDate || task.desc) && (
+                  <View style={styles.top}>
+                      <Text style={styles.desc} >{task.desc}</Text>
+                      <View>
+                        {task.dueDate && <Text style={styles.desc}>{task.dueDate?.toLocaleDateString()}</Text>}
+                        {!task.allday && <Text style={styles.desc}>{task.dueDate?.toLocaleTimeString()}</Text>}
+                      </View>
+                      
+                  </View>
+                    )}   
+
+                <Text>{task.priority}</Text>
+        </Pressable>  
+      </Animated.View>
+    </GestureDetector>
   );
 }
 const styles = StyleSheet.create({

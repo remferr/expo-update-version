@@ -8,6 +8,7 @@ import Palette from '@/components/Palette';
 import {ModalProps} from '@/types';
 import { KeyboardAvoidingView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 
 export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
    const colors = ['#ADD8E6', '#FBCEB1', '#C1E1C1', '#FFECB3'];
@@ -174,8 +175,9 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
         onRequestClose={onClose}
         statusBarTranslucent
         >
-            <Pressable style={styles.outside} onPress={onClose}>
-              <Pressable style={styles.inside} onPress={(e) => e.stopPropagation()}>
+            <View style={styles.outside}>
+              <GestureDetector gesture={Gesture.Tap().onEnd(onClose)}>
+              <View style={styles.inside}>
                 <SafeAreaView>
                   <KeyboardAvoidingView
                     behavior={Platform.OS === 'ios' ? 'padding': 'height'}
@@ -310,8 +312,9 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
 
                   </KeyboardAvoidingView>
                 </SafeAreaView>
-              </Pressable>
-            </Pressable> 
+              </View>
+              </GestureDetector>
+            </View> 
         </Modal>
       )
 }
@@ -320,10 +323,10 @@ const styles = StyleSheet.create({
     outside:{
         flex:1,
         alignItems: "center",
-        justifyContent: "flex-start",
+        justifyContent: "center",
         backgroundColor: 'rgba(182, 197, 204, 0.5)',
         backfaceVisibility: 'hidden',
-        zIndex:6,
+        //zIndex:6,
     },
 
     inside: {
@@ -338,7 +341,7 @@ const styles = StyleSheet.create({
       elevation: 5,
       borderRadius: 8,
       borderWidth: 0,
-      zIndex: 5,
+      //zIndex: 5,
     },
 
     safeContent: {
