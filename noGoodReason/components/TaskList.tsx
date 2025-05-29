@@ -1,6 +1,6 @@
 import { View, Text, Animated, FlatList, StyleSheet} from 'react-native'
 import React from 'react'
-import TaskItem from '@/components/Task';
+import TaskItem from './Task';
 import { Task } from '@/types';
 import DraggableFlatList from 'react-native-draggable-flatlist';
 import { GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
