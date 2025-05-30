@@ -5,23 +5,42 @@ import useTasks from '@/hooks/useTasks';
 import TaskList from '@/components/TaskList';
 import CreateModal from '@/components/CreateModal';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LayoutAnimation } from 'react-native';
 
 export default function Index() {
   const insets = useSafeAreaInsets();
   const {tasks, setTasks, addTask, changeCompletion, descVisToggle} = useTasks();
   const [modalVis, setModalVis] = useState(false);
+  const [listVis, setListVis] = useState(true);
+  
+  const openModal = () => {
+    setListVis(false);
+    setTimeout(()=> setModalVis(true), 50);
+    setTimeout(()=> setListVis(true), 100);
+  }
+
+  const closeModal = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setModalVis(false);
+    setTimeout(()=> setListVis(true), 50);
+  };
+
 
   return (
     <View style={styles.container}>
       
+      {listVis &&
+        <TaskList tasks={tasks} setTasks={setTasks} modalVis={modalVis} onChangeCompletion={changeCompletion} onDescVisToggle={descVisToggle}></TaskList>
+      }
       
-      <TaskList tasks={tasks} setTasks={setTasks} onChangeCompletion={changeCompletion} onDescVisToggle={descVisToggle}></TaskList>
-
-      {modalVis && (<CreateModal visible={modalVis} onClose={() => setModalVis(false)} onAddTask={addTask}></CreateModal>)}
+      
+      <CreateModal visible={modalVis} onClose={closeModal} onAddTask={addTask}></CreateModal>
       
       
       <View style={[styles.addButtonContainer, { bottom: insets.bottom + 15}]}>
-        <Pressable style={styles.addButton} onPress={() => setModalVis(true)}>
+        <Pressable style={styles.addButton} onPress={() => {
+          openModal();
+          }}>
           <Text style={styles.addButtonText}>+</Text>
         </Pressable>
       </View>

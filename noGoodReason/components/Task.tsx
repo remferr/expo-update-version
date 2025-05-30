@@ -10,18 +10,20 @@ type TaskItemProps =  {
     task: Task;
     //drag: () => void;
     isActive?: boolean;
+    modalVis: boolean;
     onChangeCompletion: (id: string) => void; 
     onDescVisToggle: (id: string) => void; 
 };
 
     
-export default function TaskItem({task, isActive, onChangeCompletion, onDescVisToggle}: TaskItemProps) {
+export default function TaskItem({task, isActive, modalVis, onChangeCompletion, onDescVisToggle}: TaskItemProps) {
   const [color, setColor] = useState('#ADD8E6');
 
   const dragging = useSharedValue(false);
   const distance = useSharedValue(0);
 
   const panGesture = Gesture.Pan()
+  .enabled(!modalVis)
     .onStart(() => {
       'worklet';
     dragging.value = true;
@@ -35,6 +37,13 @@ export default function TaskItem({task, isActive, onChangeCompletion, onDescVisT
       distance.value = withSpring(0);
       dragging.value = false;
   });
+
+  useEffect(() => {
+    if (!modalVis) {
+      distance.value = 0;
+      dragging.value = false;
+    }
+  }, [modalVis]);
 
   const animateStyle = useAnimatedStyle(() => ({
     transform: [{translateY: distance.value}],
@@ -54,9 +63,11 @@ export default function TaskItem({task, isActive, onChangeCompletion, onDescVisT
       
       
   return (
-    <GestureDetector gesture={panGesture}>
+    <GestureDetector gesture={panGesture}
+    >
       <Animated.View style={[styles.todoItem, animateStyle]}>
         <Pressable 
+          disabled={modalVis}
           onPress={() => onDescVisToggle(task.id)} 
         >
                 <View style={styles.top}>
@@ -65,7 +76,7 @@ export default function TaskItem({task, isActive, onChangeCompletion, onDescVisT
                     <Text style={[styles.title, task.completed && styles.completedTask]} >{task.title}</Text> 
                   </View>
                                 
-                  <Pressable onPress={() => onChangeCompletion(task.id)}>
+                  <Pressable disabled={modalVis} onPress={() => onChangeCompletion(task.id)}>
                     {checked(task.completed)}
                   </Pressable> 
                 </View> 
@@ -81,7 +92,7 @@ export default function TaskItem({task, isActive, onChangeCompletion, onDescVisT
                   </View>
                     )}   
 
-                <Text>{task.priority}</Text>
+                
         </Pressable>  
       </Animated.View>
     </GestureDetector>

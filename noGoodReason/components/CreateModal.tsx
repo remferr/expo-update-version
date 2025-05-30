@@ -9,6 +9,7 @@ import {ModalProps} from '@/types';
 import { KeyboardAvoidingView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
+import { runOnJS } from 'react-native-reanimated';
 
 export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
    const colors = ['#ADD8E6', '#FBCEB1', '#C1E1C1', '#FFECB3'];
@@ -23,10 +24,15 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
     const [minText, setMinText] = useState(dueDate ? (dueDate.getMinutes().toString().padStart(2, '0')): '');
     const [priority, setPriority] = useState(1);
 
-  useEffect(() =>{
+      useEffect(() => {
+        console.log('KeyboardAvoidingView mounted');
+      }, []);
+
+  
+    useEffect(() =>{
       if (dueDate) {
         setHrText(dueDate.getHours() % 12  === 0 ? "12" : (dueDate.getHours() % 12).toString().padStart(2,'0'));
-      setMinText(dueDate.getMinutes().toString().padStart(2, '0'));
+        setMinText(dueDate.getMinutes().toString().padStart(2, '0'));
       }
       else {
         setHrText('');
@@ -38,22 +44,20 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
       if (dueDate){
         setDueDate(null);
         setAllDay(null);
+        //setHrText('');
+        //setMinText('');
       }
       else {
-        setDueDate(new Date());
+        const upDate = new Date();
+        setDueDate(upDate);
         setAllDay(true);
+
+        //setHrText(upDate.getHours() % 12  === 0 ? "12" : (upDate.getHours() % 12).toString().padStart(2,'0'));
+        //setMinText(upDate.getMinutes().toString().padStart(2, '0'));
       }
     }
   
-    
-  useEffect(() => {
-    if (visible) {
-      setTitle('');
-      setDesc('');
-      setVisCalendar(false);
-      setPriority(1);
-    }
-  }, [visible]);
+  
     
     // const submit = () => {
     //   Keyboard.dismiss();
@@ -77,6 +81,18 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
     //   }
     // }
 
+    const reset = () => {
+        setTitle('');
+        setDesc('');
+        setVisCalendar(false);
+        setVisColors(false);
+        setDueDate(null);
+        setAllDay(null);
+        setPriority(1);
+        
+    }
+
+
     const submit = () => {
        Keyboard.dismiss();
        if (!title.trim()) return;
@@ -92,11 +108,7 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
           priority,
         });
 
-        setTitle('');
-        setDesc('');
-        setVisCalendar(false);
-        setPriority(1);
-
+        reset();
         onClose();
     }
 
@@ -168,19 +180,26 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
 
 
     return (
+      
       <Modal
         visible={visible}
         transparent
         animationType="fade"
-        onRequestClose={onClose}
+        onRequestClose={() => {
+          reset();
+          onClose();
+        }}
         statusBarTranslucent
         >
-            <View style={styles.outside}>
-              <GestureDetector gesture={Gesture.Tap().onEnd(onClose)}>
-              <View style={styles.inside}>
+            <Pressable style={styles.outside} onPress={() => {
+              reset();
+              onClose();
+            }}>
+              <Pressable style={styles.inside} onPress={(e) => e.stopPropagation()}>
                 <SafeAreaView>
                   <KeyboardAvoidingView
                     behavior={Platform.OS === 'ios' ? 'padding': 'height'}
+                    keyboardVerticalOffset={Platform.OS ==='ios'? 80: 0}
                     style={styles.safeContent}
                   >
                     <View style={styles.basicSection}>
@@ -212,7 +231,7 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
                   <View>
                     <View style={styles.dateRow}>
                       
-                      <Pressable onPress={() => {dueDateToggle()}} style={styles.dateRow}>
+                      <Pressable onPress={() => {dueDateToggle()}}>
                         <MaterialIcons name="edit-calendar" size={24} color="#ADD8E6"/>
                       </Pressable>
                       
@@ -232,9 +251,9 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
                       }
                       </View>
 
-                      <View style={styles.dateRow}>
+                       <View style={styles.dateRow}>
                       {dueDate != null ?
-                        
+
                         <View style={styles.timeHolder}>
                           <Pressable onPress={() => setAllDay(!allday)}  style={styles.dateRow}>
                             <Feather name="clock" size={20} color={"#ADD8E6"}/>
@@ -243,7 +262,7 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
                           
                           {!allday &&
                               <View style={styles.dateRow}>
-                                
+
                                 <TextInput 
                                     style={styles.dateText} 
                                     inputMode='numeric' 
@@ -277,7 +296,7 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
                                       <Pressable onPress={() => {AMPM()}}>
                                           {<Text style={styles.dateText}>{ dueDate.getHours() < 12 ? 'AM': 'PM' }</Text>}
                                       </Pressable>
-                                    </View>
+                                  </View>
                                   }
 
                                 </View>
@@ -287,16 +306,16 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
                 </View>
 
                 <View style={styles.priorityCont}>
-                  <Pressable onPress={() => {if (priority !== 0) {
-                    setPriority(priority-1)}
-                  }}>
+                  <Pressable onPress={() => setPriority(priority+1)}>
                     <MaterialIcons name="keyboard-arrow-up" size={20} color="#ADD8E6" />
                   </Pressable>
 
                     <Text style={styles.priorityText} >{priority}</Text>
 
                   <Pressable onPress={() => 
-                    setPriority(priority+1)}
+                  {if (priority !== 0) {
+                    setPriority(priority-1)}
+                  }}
                     >
                     <MaterialIcons name="keyboard-arrow-down" size={20} color="#ADD8E6"/>
                   </Pressable>
@@ -312,9 +331,8 @@ export default function CreateModal({visible, onClose, onAddTask}: ModalProps) {
 
                   </KeyboardAvoidingView>
                 </SafeAreaView>
-              </View>
-              </GestureDetector>
-            </View> 
+              </Pressable>
+            </Pressable> 
         </Modal>
       )
 }
@@ -323,9 +341,10 @@ const styles = StyleSheet.create({
     outside:{
         flex:1,
         alignItems: "center",
-        justifyContent: "center",
+        //justifyContent: "center",
         backgroundColor: 'rgba(182, 197, 204, 0.5)',
-        backfaceVisibility: 'hidden',
+        //backfaceVisibility: 'hidden',
+        position: 'relative',
         //zIndex:6,
     },
 

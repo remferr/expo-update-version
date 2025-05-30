@@ -3,15 +3,22 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "@/*": [
-        "./*"
-      ]
-    }
+      "@/*": ["./*"]
+    },
+    "module": "esnext",
+    "moduleResolution": "bundler"
   },
   "include": [
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.ts",
-    "expo-env.d.ts"
+    "expo-env.d.ts",
+    "hooks/useTasks.js",
+    "types.js",
+    "components/CreateModal.jsx",
+    "components/TaskList.jsx",
+    "components/Task.jsx",
+    "app/index.jsx",
+    "app/_layout.jsx"
   ]
 }
