@@ -31,6 +31,7 @@ export default function TaskItem({task, isActive, modalVis, onChangeCompletion, 
     .onUpdate((e) => {
       'worklet';
     distance.value = e.translationY;
+    
   })
     .onEnd(() => {
       'worklet';
