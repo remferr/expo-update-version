@@ -1,10 +1,11 @@
 import { View, Text, FlatList, StyleSheet} from 'react-native'
-import React from 'react'
+import React, { useEffect } from 'react'
 import TaskItem from './Task';
 import { Task } from '@/types';
-import DraggableFlatList from 'react-native-draggable-flatlist';
 import { GestureDetector, Gesture} from 'react-native-gesture-handler';
 import Animated, {useAnimatedStyle, useSharedValue, withSpring} from 'react-native-reanimated';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import type { SharedValue } from 'react-native-reanimated';
 
 type TaskListProps = {
     tasks: Task[];
@@ -14,30 +15,40 @@ type TaskListProps = {
     onDescVisToggle : (id: string) => void;
 };
 
-// const overlap = (id, y) => {
-  
-// }
+
 
 export default function TaskList({tasks, setTasks, modalVis, onChangeCompletion, onDescVisToggle }: TaskListProps) {
 
+  const position = useSharedValue<{[key: string]: number}>(
+    Object.fromEntries(tasks.map((task, index) => [task.id, index]))
+  );
+
+  useEffect(() => {
+    position.value = Object.fromEntries(tasks.map((task, index) => [task.id, index]));
+  }, [tasks]);
+
+  const sorted = [...tasks].sort(
+    (a,b) => position.value[a.id] - position.value[b.id]
+  );
 
  return (
-      <FlatList
-        data={tasks}
-        renderItem={({ item}) => (
-          <TaskItem
-            task={item}
-            modalVis={modalVis}
-            onChangeCompletion={onChangeCompletion}
-            onDescVisToggle={onDescVisToggle}
-          />
-        )}
-        keyExtractor={(item) => item.id}
-        style={styles.container}
-        contentContainerStyle={styles.itemCont}
-        key={modalVis? 'open': 'closed'}
-      >
-      </FlatList>
+      <GestureHandlerRootView style={{flex: 1}}>
+        <View style={{position: 'relative', height: tasks.length * 70}}>
+          {sorted.map((task) =>  (
+            <TaskItem
+              key={task.id}
+              tasks={tasks}
+              setTasks={setTasks}
+              task={task}
+              position={position}
+              modalVis={modalVis}
+              onChangeCompletion={onChangeCompletion}
+              onDescVisToggle={onDescVisToggle}
+
+            />
+          ))}
+        </View>
+      </GestureHandlerRootView>
   );
 }
 
