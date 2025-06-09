@@ -19,28 +19,28 @@ type TaskListProps = {
 
 export default function TaskList({tasks, setTasks, modalVis, onChangeCompletion, onDescVisToggle }: TaskListProps) {
 
-  const position = useSharedValue<{[key: string]: number}>(
-    Object.fromEntries(tasks.map((task, index) => [task.id, index]))
-  );
+  // const position = useSharedValue<{[key: string]: number}>(
+  //   Object.fromEntries(tasks.map((task, index) => [task.id, index]))
+  // );
 
-  useEffect(() => {
-    position.value = Object.fromEntries(tasks.map((task, index) => [task.id, index]));
-  }, [tasks]);
+  // useEffect(() => {
+  //   position.value = Object.fromEntries(tasks.map((task, index) => [task.id, index]));
+  // }, [tasks]);
 
-  const sorted = [...tasks].sort(
-    (a,b) => position.value[a.id] - position.value[b.id]
-  );
+  // const sorted = [...tasks].sort(
+  //   (a,b) => position.value[a.id] - position.value[b.id]
+  // );
 
  return (
       <GestureHandlerRootView style={{flex: 1}}>
         <View style={{position: 'relative', height: tasks.length * 70}}>
-          {sorted.map((task) =>  (
+          {tasks.map((task) =>  (
             <TaskItem
               key={task.id}
               tasks={tasks}
               setTasks={setTasks}
               task={task}
-              position={position}
+              
               modalVis={modalVis}
               onChangeCompletion={onChangeCompletion}
               onDescVisToggle={onDescVisToggle}
